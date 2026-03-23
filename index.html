@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Explore Saint John</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #f7f3ee;
+  --card: #ffffff;
+  --navy: #0d2137;
+  --teal: #1a6b5a;
+  --amber: #d4821a;
+  --rust: #b84a2e;
+  --muted: #8a8a8a;
+  --border: #e4ddd6;
+  --tag-bg: #eef6f4;
+  --tag-text: #1a6b5a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--navy);
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; flex-direction: column; animation: fadeIn 0.35s ease; }
+.screen.active { display: flex; }
+@keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+
+/* ── WELCOME ── */
+#welcome {
+  background: var(--navy);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 30% 20%, rgba(26,107,90,0.35) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(212,130,26,0.2) 0%, transparent 55%);
+}
+
+.welcome-wave {
+  position: absolute; bottom: 0; left: 0; width: 100%;
+  opacity: 0.15;
+}
+
+.w-ship { font-size: 3rem; margin-bottom: 1rem; position: relative; animation: bob 3s ease-in-out infinite; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+.w-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.05;
+  position: relative;
+  margin-bottom: 0.4rem;
+}
+.w-title span { color: #f0c060; }
+
+.w-sub {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  color: rgba(255,255,255,0.6);
+  font-size: 1rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+/* time picker */
+.time-label {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.time-pills {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.time-pill {
+  padding: 0.55rem 1.1rem;
+  border-radius: 2rem;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+}
+.time-pill:hover, .time-pill.selected {
+  background: #f0c060;
+  border-color: #f0c060;
+  color: var(--navy);
+}
+
+.go-btn {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: var(--teal);
+  color: white;
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.04em;
+}
+.go-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,107,90,0.4); }
+.go-btn:disabled { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
+
+/* ── TOP BAR (main app) ── */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar-title { font-size: 1.05rem; font-weight: 800; }
+.topbar-title span { color: var(--teal); }
+
+.countdown-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fef3e2;
+  border: 1px solid #f0c060;
+  border-radius: 2rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+/* ── NAV TABS ── */
+.nav-tabs {
+  display: flex;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 57px;
+  z-index: 40;
+}
+
+.nav-tab {
+  flex: 1;
+  padding: 0.7rem 0.5rem;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: 'Syne', sans-serif;
+}
+.nav-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+
+/* ── TAB PANELS ── */
+.tab-panel { display: none; padding: 1.25rem; flex-direction: column; gap: 1rem; }
+.tab-panel.active { display: flex; }
+
+/* ── WEATHER BANNER ── */
+.weather-banner {
+  background: linear-gradient(135deg, #1a6b5a, #2a9070);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.weather-left { display: flex; align-items: center; gap: 0.75rem; }
+.weather-icon { font-size: 2rem; }
+.weather-temp { font-size: 1.6rem; font-weight: 800; }
+.weather-desc { font-size: 0.78rem; opacity: 0.8; font-family: 'Lora', serif; font-style: italic; }
+.weather-note { font-size: 0.75rem; opacity: 0.85; text-align: right; max-width: 110px; line-height: 1.4; }
+
+/* ── SECTION HEADER ── */
+.sec-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: -0.25rem;
+}
+.sec-title { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.sec-link { font-size: 0.72rem; color: var(--teal); font-weight: 700; cursor: pointer; text-decoration: none; }
+
+/* ── ITINERARY CARDS ── */
+.itin-card {
+  background: var(--card);
+  border-radius: 1.1rem;
+  border: 1px solid var(--border);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+}
+.itin-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); transform: translateY(-1px); }
+
+.itin-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.itin-body { flex: 1; }
+.itin-name { font-size: 0.97rem; font-weight: 700; margin-bottom: 0.2rem; }
+.itin-meta { font-size: 0.78rem; color: var(--muted); font-family: 'Lora', serif; font-style: italic; margin-bottom: 0.45rem; }
+
+.itin-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.tag {
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.4rem;
+  text-transform: uppercase;
+}
+.tag.deal { background: #fef3e2; color: var(--amber); }
+.tag.busy { background: #fdeaea; color: var(--rust); }
+.tag.quiet { background: #eef6f4; color: var(--teal); }
+
+.itin-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; flex-shrink: 0; }
+.itin-dist { font-size: 0.75rem; font-weight: 700; color: var(--navy); }
+.itin-time { font-size: 0.7rem; color: var(--muted); }
+.itin-icon { font-size: 1.3rem; }
+
+/* ── SURPRISE BTN ── */
+.surprise-btn {
+  width: 100%;
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  padding: 1rem;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.2s;
+  letter-spacing: 0.04em;
+}
+.surprise-btn:hover { background: #1a3552; }
+
+/* ── MAP TAB ── */
+.map-placeholder {
+  border-radius: 1.1rem;
+  overflow: hidden;
+  position: relative;
+  height: 240px;
+  background: #d4e9e0;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fake-map {
+  width: 100%; height: 100%;
+  position: relative;
+  background: #e8f0eb;
+}
+
+/* streets */
+.fake-map::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(#c8d8d0 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(90deg, #c8d8d0 1px, transparent 1px) 0 0 / 40px 40px;
+}
+
+.map-pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+.map-pin-dot {
+  width: 28px; height: 28px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.map-pin-dot span { transform: rotate(45deg); font-size: 0.8rem; }
+.map-pin-label {
+  background: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.3rem;
+  margin-top: 2px;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+
+.map-pin:nth-child(1) .map-pin-dot { background: var(--navy); }
+.map-pin:nth-child(2) .map-pin-dot { background: var(--teal); }
+.map-pin:nth-child(3) .map-pin-dot { background: var(--amber); }
+.map-pin:nth-child(4) .map-pin-dot { background: var(--rust); }
+.map-pin:nth-child(5) .map-pin-dot { background: var(--teal); }
+
+.you-dot {
+  position: absolute;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #2463eb;
+  border: 3px solid white;
+  box-shadow: 0 0 0 4px rgba(36,99,235,0.25);
+  bottom: 30%; left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ── DEALS TAB ── */
+.deal-card {
+  background: var(--card);
+  border-radius: 1.1rem;
+  border: 1px solid var(--border);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.deal-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+
+.deal-badge {
+  background: #fef3e2;
+  border: 1.5px solid #f0c060;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.7rem;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.deal-body { flex: 1; }
+.deal-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.2rem; }
+.deal-desc { font-size: 0.78rem; color: var(--muted); font-family: 'Lora', serif; font-style: italic; line-height: 1.4; }
+.deal-discount { margin-top: 0.4rem; font-size: 0.72rem; font-weight: 700; color: var(--amber); }
+
+/* ── MORE TAB ── */
+.more-section-title { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 0.5rem; }
+.more-list { background: var(--card); border-radius: 1.1rem; border: 1px solid var(--border); overflow: hidden; }
+.more-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+.more-row:last-child { border-bottom: none; }
+.more-row:hover { background: var(--bg); }
+.more-row-icon { font-size: 1.3rem; flex-shrink: 0; width: 28px; text-align: center; }
+.more-row-text { flex: 1; }
+.more-row-title { font-size: 0.9rem; font-weight: 700; }
+.more-row-sub { font-size: 0.75rem; color: var(--muted); }
+.more-row-arrow { color: var(--muted); font-size: 0.9rem; }
+
+.lang-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.lang-pill {
+  padding: 0.4rem 0.9rem;
+  border-radius: 2rem;
+  border: 1.5px solid var(--border);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--card);
+}
+.lang-pill.selected { background: var(--navy); color: white; border-color: var(--navy); }
+
+/* ── DETAIL SHEET ── */
+#detail {
+  position: fixed; inset: 0;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+}
+
+#detail.open { display: flex; }
+
+.detail-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(13,33,55,0.5);
+  animation: fadeBackdrop 0.3s ease;
+}
+@keyframes fadeBackdrop { from { opacity:0; } to { opacity:1; } }
+
+.detail-sheet {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--bg);
+  border-radius: 1.5rem 1.5rem 0 0;
+  padding: 1.5rem 1.5rem 2.5rem;
+  animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  max-height: 82vh;
+  overflow-y: auto;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.sheet-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 1.25rem; }
+.sheet-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.sheet-name { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.25rem; }
+.sheet-meta { font-family: 'Lora', serif; font-style: italic; color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+.sheet-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.sheet-desc { font-size: 0.88rem; line-height: 1.7; color: #4a4a4a; margin-bottom: 1.25rem; font-family: 'Lora', serif; }
+
+.sheet-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
+.sheet-info-box { background: var(--card); border-radius: 0.75rem; padding: 0.75rem; border: 1px solid var(--border); }
+.sheet-info-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.2rem; }
+.sheet-info-val { font-size: 0.9rem; font-weight: 700; }
+
+.sheet-btn {
+  width: 100%;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  padding: 1rem;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--navy);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 200;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ── WELCOME SCREEN ── -->
+<div class="screen active" id="welcome">
+  <div class="welcome-bg"></div>
+  <div class="w-ship">🚢</div>
+  <h1 class="w-title">Welcome to<br/><span>Saint John</span></h1>
+  <p class="w-sub">Your city guide for today's visit</p>
+  <p class="time-label">How long do you have in port?</p>
+  <div class="time-pills">
+    <button class="time-pill" data-hours="1">1 hour</button>
+    <button class="time-pill" data-hours="2">2 hours</button>
+    <button class="time-pill" data-hours="3">3 hours</button>
+    <button class="time-pill" data-hours="4">4 hours</button>
+    <button class="time-pill" data-hours="5">5+ hours</button>
+  </div>
+  <button class="go-btn" id="goBtn" disabled>Let's Explore →</button>
+
+  <svg class="welcome-wave" viewBox="0 0 430 60" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 30 Q107 0 215 30 Q322 60 430 30 L430 60 L0 60Z" fill="white" opacity="0.06"/>
+  </svg>
+</div>
+
+<!-- ── MAIN APP SCREEN ── -->
+<div class="screen" id="app">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-title">Explore <span>Saint John</span></div>
+    <div class="countdown-chip">
+      ⏱ <span id="countdown-display">3h 00m</span> left
+    </div>
+  </div>
+
+  <!-- Nav tabs -->
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="explore">Explore</button>
+    <button class="nav-tab" data-tab="map">Map</button>
+    <button class="nav-tab" data-tab="deals">Deals</button>
+    <button class="nav-tab" data-tab="more">More</button>
+  </div>
+
+  <!-- ── EXPLORE TAB ── -->
+  <div class="tab-panel active" id="tab-explore">
+
+    <!-- Weather -->
+    <div class="weather-banner">
+      <div class="weather-left">
+        <div class="weather-icon">⛅</div>
+        <div>
+          <div class="weather-temp">14°C</div>
+          <div class="weather-desc">Partly cloudy, light breeze</div>
+        </div>
+      </div>
+      <div class="weather-note">Great day to walk the uptown!</div>
+    </div>
+
+    <!-- Itinerary -->
+    <div class="sec-header">
+      <span class="sec-title">Your Itinerary</span>
+      <span class="sec-link" id="surpriseLink">🎲 Surprise me</span>
+    </div>
+
+    <div id="itinerary-list">
+      <!-- filled by JS -->
+    </div>
+
+    <button class="surprise-btn" id="surpriseBtn">🎲 Show me something unexpected</button>
+
+  </div>
+
+  <!-- ── MAP TAB ── -->
+  <div class="tab-panel" id="tab-map">
+    <div class="map-placeholder">
+      <div class="fake-map">
+        <div class="map-pin" style="left:50%;top:70%">
+          <div class="map-pin-dot"><span>📍</span></div>
+          <div class="map-pin-label">You are here</div>
+        </div>
+        <div class="map-pin" style="left:55%;top:45%">
+          <div class="map-pin-dot"><span>🛒</span></div>
+          <div class="map-pin-label">City Market</div>
+        </div>
+        <div class="map-pin" style="left:30%;top:35%">
+          <div class="map-pin-dot"><span>💧</span></div>
+          <div class="map-pin-label">Reversing Falls</div>
+        </div>
+        <div class="map-pin" style="left:72%;top:30%">
+          <div class="map-pin-dot"><span>🏰</span></div>
+          <div class="map-pin-label">Fort Howe</div>
+        </div>
+        <div class="map-pin" style="left:62%;top:58%">
+          <div class="map-pin-dot"><span>☕</span></div>
+          <div class="map-pin-label">Uptown Cafés</div>
+        </div>
+        <div class="you-dot"></div>
+      </div>
+    </div>
+
+    <div class="sec-header"><span class="sec-title">Nearby Stops</span></div>
+
+    <div id="map-list">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- ── DEALS TAB ── -->
+  <div class="tab-panel" id="tab-deals">
+    <div class="sec-header"><span class="sec-title">Cruise Day Exclusives</span></div>
+
+    <div class="deal-card">
+      <div class="deal-badge">☕</div>
+      <div class="deal-body">
+        <div class="deal-name">Uptown Roasters</div>
+        <div class="deal-desc">Show your boarding pass and get a free pastry with any drink purchase.</div>
+        <div class="deal-discount">🏷 Free pastry w/ drink · 8 min walk</div>
+      </div>
+    </div>
+
+    <div class="deal-card">
+      <div class="deal-badge">🛒</div>
+      <div class="deal-body">
+        <div class="deal-name">Saint John City Market</div>
+        <div class="deal-desc">Canada's oldest continuous farmers' market. 10% off at participating vendors today.</div>
+        <div class="deal-discount">🏷 10% off · 6 min walk</div>
+      </div>
+    </div>
+
+    <div class="deal-card">
+      <div class="deal-badge">🍁</div>
+      <div class="deal-body">
+        <div class="deal-name">Loyalist House Gift Shop</div>
+        <div class="deal-desc">Historic Georgian home from 1817. Local souvenirs with cruise passenger discount.</div>
+        <div class="deal-discount">🏷 15% off souvenirs · 10 min walk</div>
+      </div>
+    </div>
+
+    <div class="deal-card">
+      <div class="deal-badge">🍺</div>
+      <div class="deal-body">
+        <div class="deal-name">Picaroons Roundhouse</div>
+        <div class="deal-desc">Local NB craft brewery taproom. Complimentary tasting flight for cruise visitors.</div>
+        <div class="deal-discount">🏷 Free tasting flight · 12 min walk</div>
+      </div>
+    </div>
+
+    <div class="deal-card">
+      <div class="deal-badge">🦞</div>
+      <div class="deal-body">
+        <div class="deal-name">East Coast Catch</div>
+        <div class="deal-desc">Fresh Maritime seafood. Show today's boarding pass for a $5 off lobster roll.</div>
+        <div class="deal-discount">🏷 $5 off lobster roll · 7 min walk</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MORE TAB ── -->
+  <div class="tab-panel" id="tab-more">
+
+    <div class="more-section-title">Getting Around</div>
+    <div class="more-list">
+      <div class="more-row">
+        <div class="more-row-icon">🚶</div>
+        <div class="more-row-text">
+          <div class="more-row-title">Walking Routes</div>
+          <div class="more-row-sub">Most uptown spots within 15 min</div>
+        </div>
+        <div class="more-row-arrow">›</div>
+      </div>
+      <div class="more-row">
+        <div class="more-row-icon">♿</div>
+        <div class="more-row-text">
+          <div class="more-row-title">Accessibility Routes</div>
+          <div class="more-row-sub">Wheelchair-friendly paths</div>
+        </div>
+        <div class="more-row-arrow">›</div>
+      </div>
+      <div class="more-row">
+        <div class="more-row-icon">🎧</div>
+        <div class="more-row-text">
+          <div class="more-row-title">Audio Walking Tour</div>
+          <div class="more-row-sub">Narrated history as you explore</div>
+        </div>
+        <div class="more-row-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="more-section-title" style="margin-top:1rem">Ship Info</div>
+    <div class="more-list">
+      <div class="more-row">
+        <div class="more-row-icon">🚢</div>
+        <div class="more-row-text">
+          <div class="more-row-title">Sail-away Reminder</div>
+          <div class="more-row-sub">Get notified 45 min before departure</div>
+        </div>
+        <div class="more-row-arrow">›</div>
+      </div>
+      <div class="more-row">
+        <div class="more-row-icon">🗺️</div>
+        <div class="more-row-text">
+          <div class="more-row-title">Back to Port Directions</div>
+          <div class="more-row-sub">Always know how to get back</div>
+        </div>
+        <div class="more-row-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="more-section-title" style="margin-top:1rem">Language</div>
+    <div class="lang-pills">
+      <div class="lang-pill selected">🇨🇦 English</div>
+      <div class="lang-pill">🇫🇷 Français</div>
+      <div class="lang-pill">🇩🇪 Deutsch</div>
+      <div class="lang-pill">🇪🇸 Español</div>
+      <div class="lang-pill">🇯🇵 日本語</div>
+    </div>
+
+    <div class="more-section-title" style="margin-top:1rem">Emergency Info</div>
+    <div class="more-list">
+      <div class="more-row">
+        <div class="more-row-icon">🏥</div>
+        <div class="more-row-text">
+          <div class="more-row-title">Nearest Medical</div>
+          <div class="more-row-sub">Saint John Regional Hospital</div>
+        </div>
+        <div class="more-row-arrow">›</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ── DETAIL SHEET ── -->
+<div id="detail">
+  <div class="detail-backdrop" id="detailBackdrop"></div>
+  <div class="detail-sheet">
+    <div class="sheet-handle"></div>
+    <div id="sheet-icon" class="sheet-icon"></div>
+    <div id="sheet-name" class="sheet-name"></div>
+    <div id="sheet-meta" class="sheet-meta"></div>
+    <div id="sheet-tags" class="sheet-tags"></div>
+    <div id="sheet-desc" class="sheet-desc"></div>
+    <div class="sheet-info-grid">
+      <div class="sheet-info-box">
+        <div class="sheet-info-label">Distance</div>
+        <div class="sheet-info-val" id="sheet-dist"></div>
+      </div>
+      <div class="sheet-info-box">
+        <div class="sheet-info-label">Time Needed</div>
+        <div class="sheet-info-val" id="sheet-time"></div>
+      </div>
+      <div class="sheet-info-box">
+        <div class="sheet-info-label">Crowd Level</div>
+        <div class="sheet-info-val" id="sheet-crowd"></div>
+      </div>
+      <div class="sheet-info-box">
+        <div class="sheet-info-label">Best For</div>
+        <div class="sheet-info-val" id="sheet-best"></div>
+      </div>
+    </div>
+    <button class="sheet-btn">Open in Maps →</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const places = [
+  {
+    icon: '🛒',
+    name: 'Saint John City Market',
+    meta: 'Canada\'s oldest farmers\' market · Est. 1876',
+    dist: '6 min walk',
+    timeNeeded: '30–45 min',
+    crowd: '🟡 Moderate',
+    best: 'Everyone',
+    tags: ['locals pick','deal','quiet'],
+    desc: 'The oldest continuous farmers\' market in Canada, operating since 1876. Browse local produce, seafood, artisan crafts, and Maritime souvenirs under the stunning ship-hull roof. A true Saint John landmark.'
+  },
+  {
+    icon: '💧',
+    name: 'Reversing Falls Rapids',
+    meta: 'Natural phenomenon · Free to view',
+    dist: '18 min walk',
+    timeNeeded: '20–30 min',
+    crowd: '🟢 Low',
+    best: 'Nature lovers',
+    tags: ['must see','free','quiet'],
+    desc: 'Witness one of nature\'s most unusual spectacles — twice a day, the Bay of Fundy\'s powerful tides reverse the flow of the Saint John River. The gorge view is dramatic and completely free to enjoy.'
+  },
+  {
+    icon: '☕',
+    name: 'Uptown Café District',
+    meta: 'King St & Charlotte St · Multiple cafés',
+    dist: '8 min walk',
+    timeNeeded: '20–40 min',
+    crowd: '🟡 Moderate',
+    best: 'Coffee lovers',
+    tags: ['deal','cozy'],
+    desc: 'A cluster of independent cafés along King and Charlotte Streets in uptown Saint John. Great for a warm drink, a bite, and to soak in local character. Many offering cruise passenger deals today.'
+  },
+  {
+    icon: '🏰',
+    name: 'Fort Howe Lookout',
+    meta: 'Historic blockhouse · Panoramic views',
+    dist: '22 min walk',
+    timeNeeded: '20–30 min',
+    crowd: '🟢 Very Low',
+    best: 'Views & history',
+    tags: ['hidden gem','free','quiet'],
+    desc: 'A reconstruction of the 1778 blockhouse overlooking the city and harbour. The panoramic view of Saint John and the Bay of Fundy from up here is spectacular and rarely crowded — most tourists never make it this far.'
+  },
+  {
+    icon: '🍁',
+    name: 'Loyalist Burial Ground',
+    meta: 'Heritage park · King\'s Square area',
+    dist: '9 min walk',
+    timeNeeded: '15 min',
+    crowd: '🟢 Low',
+    best: 'History buffs',
+    tags: ['historic','free'],
+    desc: 'One of the oldest public spaces in Canada, the Loyalist Burial Ground dates to the late 1700s. Peaceful, beautifully maintained, and steps from King\'s Square — a quiet slice of Canadian history.'
+  },
+  {
+    icon: '🦞',
+    name: 'Harbour Passage Trail',
+    meta: 'Waterfront walk · 4.5km trail',
+    dist: '5 min walk',
+    timeNeeded: '20–60 min',
+    crowd: '🟡 Moderate',
+    best: 'Walkers',
+    tags: ['outdoor','scenic'],
+    desc: 'A beautiful waterfront trail that runs along the Saint John Harbour. Walk as little or as much as you like — the route passes murals, lookouts, and connects to the uptown core. Fully paved and accessible.'
+  }
+];
+
+const surprisePlaces = [
+  {
+    icon: '🎭',
+    name: 'Imperial Theatre',
+    meta: 'Heritage performing arts · Guided visits',
+    dist: '10 min walk',
+    timeNeeded: '20 min',
+    crowd: '🟢 Very Low',
+    best: 'Arts lovers',
+    tags: ['hidden gem','historic'],
+    desc: 'A stunning 1913 Beaux-Arts theatre that hosts concerts and events. The ornate interior is one of Atlantic Canada\'s finest. Peek inside or book a short guided tour when available.'
+  },
+  {
+    icon: '🏛️',
+    name: 'New Brunswick Museum',
+    meta: 'Natural history & art · Downtown',
+    dist: '11 min walk',
+    timeNeeded: '45–60 min',
+    crowd: '🟢 Low',
+    best: 'Curious minds',
+    tags: ['indoor','locals pick'],
+    desc: 'Canada\'s oldest public museum, featuring natural history, fine art, and cultural collections from New Brunswick. Particularly good on rainy days, and rarely packed with tourists.'
+  }
+];
+
+let hoursSelected = null;
+let countdownMinutes = 180;
+let countdownTimer = null;
+
+// Time pill selection
+document.querySelectorAll('.time-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    hoursSelected = parseInt(pill.dataset.hours);
+    document.getElementById('goBtn').disabled = false;
+  });
+});
+
+// Go button
+document.getElementById('goBtn').addEventListener('click', () => {
+  countdownMinutes = hoursSelected * 60;
+  document.getElementById('welcome').classList.remove('active');
+  document.getElementById('app').classList.add('active');
+  updateCountdown();
+  countdownTimer = setInterval(updateCountdown, 60000);
+  buildItinerary();
+  buildMapList();
+});
+
+function updateCountdown() {
+  const h = Math.floor(countdownMinutes / 60);
+  const m = countdownMinutes % 60;
+  document.getElementById('countdown-display').textContent = h > 0 ? `${h}h ${String(m).padStart(2,'0')}m` : `${m}m`;
+  if (countdownMinutes > 0) countdownMinutes--;
+}
+
+// Build itinerary based on hours
+function buildItinerary() {
+  const count = Math.min(hoursSelected <= 2 ? 3 : hoursSelected <= 3 ? 4 : 5, places.length);
+  const list = document.getElementById('itinerary-list');
+  list.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    list.appendChild(makeItinCard(places[i], i + 1));
+  }
+}
+
+function makeItinCard(place, num) {
+  const card = document.createElement('div');
+  card.className = 'itin-card';
+  card.innerHTML = `
+    <div class="itin-num">${num || '★'}</div>
+    <div class="itin-body">
+      <div class="itin-name">${place.name}</div>
+      <div class="itin-meta">${place.meta}</div>
+      <div class="itin-tags">${place.tags.map(t => `<span class="tag ${t === 'deal' ? 'deal' : t === 'busy' ? 'busy' : ''}">${t}</span>`).join('')}</div>
+    </div>
+    <div class="itin-right">
+      <div class="itin-icon">${place.icon}</div>
+      <div class="itin-dist">${place.dist}</div>
+      <div class="itin-time">${place.timeNeeded}</div>
+    </div>
+  `;
+  card.addEventListener('click', () => openDetail(place));
+  return card;
+}
+
+function buildMapList() {
+  const list = document.getElementById('map-list');
+  list.innerHTML = '';
+  places.slice(0, 4).forEach(p => list.appendChild(makeItinCard(p, null)));
+}
+
+// Surprise
+document.getElementById('surpriseBtn').addEventListener('click', doSurprise);
+document.getElementById('surpriseLink').addEventListener('click', doSurprise);
+
+function doSurprise() {
+  const pick = surprisePlaces[Math.floor(Math.random() * surprisePlaces.length)];
+  openDetail(pick);
+  showToast('🎲 Here\'s a hidden gem for you!');
+}
+
+// Nav tabs
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// Detail sheet
+function openDetail(place) {
+  document.getElementById('sheet-icon').textContent = place.icon;
+  document.getElementById('sheet-name').textContent = place.name;
+  document.getElementById('sheet-meta').textContent = place.meta;
+  document.getElementById('sheet-desc').textContent = place.desc;
+  document.getElementById('sheet-dist').textContent = place.dist;
+  document.getElementById('sheet-time').textContent = place.timeNeeded;
+  document.getElementById('sheet-crowd').textContent = place.crowd;
+  document.getElementById('sheet-best').textContent = place.best;
+  document.getElementById('sheet-tags').innerHTML = place.tags.map(t => `<span class="tag">${t}</span>`).join('');
+  document.getElementById('detail').classList.add('open');
+}
+
+document.getElementById('detailBackdrop').addEventListener('click', () => {
+  document.getElementById('detail').classList.remove('open');
+});
+
+// Language pills
+document.querySelectorAll('.lang-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    showToast('🌐 Language updated!');
+  });
+});
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
